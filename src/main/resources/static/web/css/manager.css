@@ -1,0 +1,42 @@
+#table{
+    color: white;
+   background-color: black;
+   text-align: center;
+    background-image: url(./images/source.gif);
+    background-size: cover;
+    background-attachment: local;
+}
+.ship{
+    background-image: url(./images/barco.png);
+    background-size: cover;
+    background-attachment: local;
+}
+.rowColumn{
+        background-image: url(./images/background-1172581_960_720.webp);
+
+}
+.rColumn1{
+        background-image: url(./images/source22.gif);
+        background-size: cover;
+        background-attachment: local;
+}
+
+#tableSalvoes{
+    color: white;
+   background-color: black;
+   text-align: center;
+    background-image: url(./images/joy_div.gif);
+    background-size: cover;
+    background-attachment: local;
+}
+
+.salvoDamage{
+    background-color: red;
+
+    opacity: 0.9
+}
+.salvoWater{
+    background-color: blue;
+
+    opacity: 0.9
+}
