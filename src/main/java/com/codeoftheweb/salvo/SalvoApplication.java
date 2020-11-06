@@ -1,15 +1,19 @@
 package com.codeoftheweb.salvo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 @SpringBootApplication					//Le decimos de cierta manera que cree el application context
 public class SalvoApplication {			//Es la clase principal de nuestra app
+	@Autowired
+	PasswordEncoder passwordEncoder;
 
 	public static void main(String[] args) { //Es el punto de inicio de la app
 		SpringApplication.run(SalvoApplication.class, args);
@@ -21,16 +25,16 @@ public class SalvoApplication {			//Es la clase principal de nuestra app
 		return (args) -> {
 			// save a couple of customers
 			//PLAYER
-			Player player1 = new Player ("j.bauer@ctu.gov");
+			Player player1 = new Player ("j.bauer@ctu.gov", passwordEncoder.encode("24"));
 			playerRepository.save(player1);
 
-			Player player2 = new Player ("c.obrian@ctu.gov");
+			Player player2 = new Player ("c.obrian@ctu.gov", passwordEncoder.encode("42"));
 			playerRepository.save(player2);
 
-			Player player3 = new Player ("t.almeida@ctu.gov");
+			Player player3 = new Player ("t.almeida@ctu.gov", passwordEncoder.encode("mole"));
 			playerRepository.save(player3);
 
-			Player player4 = new Player ("kim_bauer@gmail.com ");
+			Player player4 = new Player ("kim_bauer@gmail.com", passwordEncoder.encode("kb"));
 			playerRepository.save(player4);
 			//GAME
 			Game game1 = new Game(LocalDateTime.now());

@@ -1,8 +1,9 @@
 package com.codeoftheweb.salvo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -20,6 +21,11 @@ public class SalvoController {
     @Autowired
     private GamePlayerRepository gamePlayerRepository;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private PlayerRepository playerRepository;
 
     @RequestMapping("/games")    //Por defecto los mapping son de tipo get como si fuera (path =/games, method= get)/Asociamos la peticion /games a la ejecucion de getGames //método al que se llama cuando la dirección URL es /api/games.
     public Set<Map<String, Object>> getGames() {         // Hace que obtenga todos los juegos y devuelva una lista de los ID.
@@ -30,6 +36,21 @@ public class SalvoController {
     @RequestMapping("/game_view/{gamePlayerId}")     //RUTA
     public Map<String,Object> getGameView(@PathVariable Long gamePlayerId) {      //PathVariable dice q Spring me va a inyectar el num que salga de la ruta /game_vew/{gamePlayerId} El dato long ID
         return gamePlayerRepository.findById(gamePlayerId.longValue()).get().gameViewDTO();
+    }
+    @RequestMapping(path = "/player", method = RequestMethod.POST)
+    private ResponseEntity<Object> register(
+            @RequestParam first, @RequestParam last,
+            @RequestParam String email, @RequestParam String password) {
 
+        if (firstName.isEmpty() || last.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            return new ResponseEntity<>("Missing data", HttpStatus.FORBIDDEN);
+        }
+
+        if (playerRepository.findOneByUserName(userName) !=  null) {
+            return new ResponseEntity<>("Name already in use", HttpStatus.FORBIDDEN);
+        }
+
+        playerRepository.save(new Player(first, last, email, passwordEncoder.encode(password)));
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

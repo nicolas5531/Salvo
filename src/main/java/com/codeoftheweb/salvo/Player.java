@@ -15,6 +15,7 @@ public class Player {
     private long id;
 
     private String userName;
+    private String password;
 
     @OneToMany(mappedBy="player", fetch=FetchType.EAGER)
     private Set<GamePlayer> gamePlayers = new HashSet<>();
@@ -26,9 +27,10 @@ public class Player {
     public Player() {       //SpringData usa "hibernate" que utiliza el constructor vacio por defecto
     }                        // sino no va a saber que (parametro) hay q utilizar para poder pasar el objeto.
 
-    public Player(String user) {
+    public Player(String user, String password) {
 
         this.userName = user;
+        this.password = password;
     }
 
     public void addGamePlayer(GamePlayer gamePlayer) {
@@ -87,6 +89,13 @@ public class Player {
         this.scores = scores;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
 
 
