@@ -17,7 +17,6 @@ public class SalvoApplication {			//Es la clase principal de nuestra app
 
 	public static void main(String[] args) { //Es el punto de inicio de la app
 		SpringApplication.run(SalvoApplication.class, args);
-
 	}
 
 	@Bean    //Es un saco que toma spring o bolsa que contiene datos y acciones. Todos los objetos que estan en Spring son beans. Al hacer esto metemos a toda la data en el Application context
