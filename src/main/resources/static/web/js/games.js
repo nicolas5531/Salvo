@@ -35,13 +35,11 @@ var app = new Vue({
                             alert("Invalid User/Password!")
                         else
                             alert("Shit happend Dude!")
-
                     })
             }
             else{
                 alert("Debe llenar los datos correctamente(email or password)")
             }
-
         },
 
         takeNames: function(){

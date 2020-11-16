@@ -52,8 +52,9 @@ public class GamePlayer {
 
     public Map<String, Object> toDTO() {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
-        dto.put("id", id);
-        dto.put("player", player.toDTO());
+        dto.put("gpId", id);
+        dto.put("id", player.getId());
+        dto.put("name", player.getUserName());
         dto.put("score",getScore() != null ? getScore().getPoints() : null);      //OPERADOR TERNARIO o datoQpuedeSerNull :? datoAmostrarCuandoEsNull
         return dto;
     }
