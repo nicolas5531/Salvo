@@ -13,6 +13,24 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col">
+                <div class="login-page col-sm-12 col-md-9 text-center" v-show="player == 'Guest'">
+                    <div class="form">
+                        <p class="message">Not registered? <a href="#">Create an account</a></p>
+                        <input type="text" v-model:value="signUser" placeholder="Email" />
+                        <input type="password" v-model:value="signPassword" placeholder="Password" />
+                        <button class="btn btn-primary" type="button" v-on:click="register">create</button>
+                        <p class="message">Already registered? <a href="#">Sign In</a></p>
+                        <button class="btn btn-success" v-on:click="logIn">login</button>
+                    </div>
+                </div>
+                <div v-if="player != 'Guest'">
+                    <span> {{ player.email}} </span> <button type="button" v-on:click="logOut">SignOut</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
                 <ul>
                     <li v-for="game in games">
                         {{game.created | formatDate}} {{game.gamePlayers[0] != null ? game.gamePlayers[0].player.email : ""}}, {{game.gamePlayers[1] != null ? game.gamePlayers[1].player.email : ""}}
@@ -21,13 +39,13 @@
             </div>
             <table  class="col-5 ml-5 table table-bordered table-hover ">
                 <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Total</th>
-                    <th>Won</th>
-                    <th>Lost</th>
-                    <th>Tied</th>
-                </tr>
+                    <tr>
+                        <th>Name</th>
+                        <th>Total</th>
+                        <th>Won</th>
+                        <th>Lost</th>
+                        <th>Tied</th>
+                    </tr>
                 </thead>
                 <tbody>
                     <tr v-for="statistic in userStatistics">

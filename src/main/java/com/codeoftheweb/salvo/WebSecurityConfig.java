@@ -16,7 +16,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()                                                //Los matchers se prueban en orden...
-                .antMatchers("/api/game_view/**", "/web/game.html/**").hasAuthority("USER")     //Este match determina el acceso
+                .antMatchers("/api/game_view/**", "web//game.html/**").hasAuthority("USER")     //Este match determina el acceso
                 .antMatchers("/rest/**").hasAuthority("USER")
                 .and()                                                          //Inicia una nueva seccion de reglas
                 .formLogin()                                                  // dice que utilice el inicio de sesión basado en formularios

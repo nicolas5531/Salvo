@@ -1,15 +1,49 @@
 var api = '/api/games';
 
-
 var app = new Vue({
     el: "#app",
     data: {
         games: [],
         users: [],
         userStatistics: [],
-
+        signUser: "",
+        signPassword: "",
+        player: "",
     },
     methods:{
+        register: function(){
+            if(app.signUser.length != 0 && app.signPassword.length > 4){
+                $.post("/api/player", { email: app.signUser,password: app.signPassword})
+                    .done(function() { app.logIn(app.signUser, app.signPassword)} )
+                    .fail(function(error) {alert(error.responseText)})
+            }
+            else{
+                alert("Debe llenar los datos correctamente")
+            }
+        },
+
+        logOut: function(){
+            $.post("/api/logout").done(function() { location.reload() })
+        },
+
+        logIn: function(){
+            if(app.signUser.length != 0 && app.signPassword.length > 4){
+                $.post("/api/login", { username: app.signUser,password: app.signPassword})
+                    .done(function() { alert("Successful logIn!"); location.reload() })
+                    .fail(function(error) {
+                        if(error.status == 401)                         //cuando ejecutamos una sola accion podemos ponerlo sin llave...
+                            alert("Invalid User/Password!")
+                        else
+                            alert("Shit happend Dude!")
+
+                    })
+            }
+            else{
+                alert("Debe llenar los datos correctamente(email or password)")
+            }
+
+        },
+
         takeNames: function(){
             var players = [];
             for(var i = 0; i < app.games.length; i++){
@@ -20,7 +54,6 @@ var app = new Vue({
               }
             }
             app.users = players;
-            console.log(app.users);
         },
         takeScore: function(){
             var totScores = [];
@@ -36,7 +69,6 @@ var app = new Vue({
                     }
                 }
             }
-            console.log(totScores);
             return(totScores);
         },
         takeWon: function(){
@@ -53,7 +85,6 @@ var app = new Vue({
                     }
                 }
             }
-            console.log(won);
             return(won);
         },
         takeLost: function(){
@@ -87,7 +118,6 @@ var app = new Vue({
                     }
                 }
             }
-            console.log(tied);
             return(tied);
         },
         statistics: function(){
@@ -114,7 +144,8 @@ fetch(api, {
         method: 'GET',
         headers: {
         }
-    }).then(function (response) {
+    })
+    .then(function (response) {
     console.log(response)
         if (response.ok) {
             return response.json();
@@ -124,14 +155,11 @@ fetch(api, {
         }
     })
     .then(function (data) {
-        app.games = data;
-        app.takeNames();
-        app.takeScore();
-        app.takeWon();
-        app.takeLost();
-        app.takeTied();
+        app.games = data.games;
+        app.player = data.player;
         app.statistics();
     })
     .catch(function (error) {
         console.log('Looks like there was a problem: \n', error);
     });
+
