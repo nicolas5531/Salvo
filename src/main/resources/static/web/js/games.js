@@ -9,8 +9,10 @@ var app = new Vue({
         signUser: "",
         signPassword: "",
         player: "",
+        isJoinGame: "",
     },
     methods:{
+
         register: function(){
             if(app.signUser.length != 0 && app.signPassword.length > 4){
                 $.post("/api/player", { email: app.signUser,password: app.signPassword})
@@ -29,7 +31,7 @@ var app = new Vue({
         logIn: function(){
             if(app.signUser.length != 0 && app.signPassword.length > 4){
                 $.post("/api/login", { username: app.signUser,password: app.signPassword})
-                    .done(function() { alert("Successful logIn!"); location.reload() })
+                    .done(function() { alert("Successful logIn!"); location.reload();})
                     .fail(function(error) {
                         if(error.status == 401)                         //cuando ejecutamos una sola accion podemos ponerlo sin llave...
                             alert("Invalid User/Password!")
@@ -156,6 +158,7 @@ fetch(api, {
         app.games = data.games;
         app.player = data.player;
         app.statistics();
+
     })
     .catch(function (error) {
         console.log('Looks like there was a problem: \n', error);

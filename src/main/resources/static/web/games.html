@@ -31,9 +31,15 @@
 
         <div class="row">
             <div class="col">
-                <ul>
-                    <li v-for="game in games">
-                        {{game.created | formatDate}} {{game.gamePlayers[0] != null ? game.gamePlayers[0].player.email : ""}}, {{game.gamePlayers[1] != null ? game.gamePlayers[1].player.email : ""}}
+                <ul v-for="game in games">
+                    <li v-if=" player != 'Guest' && game.gamePlayers[0].player.id == player.id ">
+                        {{game.created | formatDate}} <a v-bind:href="'http://localhost:8080/web/game.html?gp='+game.gamePlayers[0].gpId" target='_blank'>{{game.gamePlayers[0].player.email}}</a>, {{game.gamePlayers[1] != null ? game.gamePlayers[1].player.email : ""}}
+                    </li>
+                    <li v-else-if=" player != 'Guest' && (game.gamePlayers[1] != null && game.gamePlayers[1].player.id == player.id)">
+                        {{game.created | formatDate}} {{game.gamePlayers[0].player.email}}, <a v-bind:href="'http://localhost:8080/web/game.html?gp='+game.gamePlayers[1].gpId" target='_blank'>{{game.gamePlayers[1].player.email}}</a>
+                    </li>
+                    <li v-else>
+                        {{game.created | formatDate}} {{game.gamePlayers[0].player.email}}, {{game.gamePlayers[1] != null ? game.gamePlayers[1].player.email : ""}}
                     </li>
                 </ul>
             </div>

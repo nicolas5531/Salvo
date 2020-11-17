@@ -24,16 +24,16 @@ public class SalvoApplication {			//Es la clase principal de nuestra app
 		return (args) -> {
 			// save a couple of customers
 			//PLAYER
-			Player player1 = new Player ("j.bauer@ctu.gov", passwordEncoder.encode("24"));
+			Player player1 = new Player ("j.bauer@ctu.gov", passwordEncoder.encode("242424"));
 			playerRepository.save(player1);
 
-			Player player2 = new Player ("c.obrian@ctu.gov", passwordEncoder.encode("42"));
+			Player player2 = new Player ("c.obrian@ctu.gov", passwordEncoder.encode("424242"));
 			playerRepository.save(player2);
 
-			Player player3 = new Player ("t.almeida@ctu.gov", passwordEncoder.encode("mole"));
+			Player player3 = new Player ("t.almeida@ctu.gov", passwordEncoder.encode("molemole"));
 			playerRepository.save(player3);
 
-			Player player4 = new Player ("kim_bauer@gmail.com", passwordEncoder.encode("kb"));
+			Player player4 = new Player ("kim_bauer@gmail.com", passwordEncoder.encode("kbkbkb"));
 			playerRepository.save(player4);
 			//GAME
 			Game game1 = new Game(LocalDateTime.now());

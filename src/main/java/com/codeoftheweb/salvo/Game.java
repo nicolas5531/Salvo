@@ -51,7 +51,7 @@ public class Game {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("id", id);                         //podria poner this o no ya que la propiedad esta dentro de la clase.
         dto.put("created", date);
-        dto.put("players", gamePlayers.stream().map(GamePlayer::toDTO));
+        dto.put("gamePlayers", gamePlayers.stream().map(GamePlayer::toDTO));
         return dto;
     }
     //Getter & Setter
