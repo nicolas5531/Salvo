@@ -11,12 +11,14 @@
 <body>
 
 <div id="app">
-    <div class="container-fluid">
+    <div class="container-fluid" v-show="gameView != null">
         <div class="row">
             <div class="col-12">
                 <ul>
                     {{ viewer != null ? viewer.email: '' }}
-                    (you) Vs {{ vs != null ? viewer.email: 'Waiting for player' }}
+                    (you) Vs {{ vs != null ? vs.email: 'Waiting for player' }}
+
+                    <button type="button" class="btn btn-outline-warning" v-on:click="logOut">SignOut</button>
                 </ul>
             </div>
             <table id="table" class="col-5 ml-5 table table-bordered table-hover ">

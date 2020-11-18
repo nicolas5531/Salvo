@@ -8,11 +8,16 @@ var app = new Vue({
         gp: null,
         columns: ["1", "2", "3", "4","5", "6", "7", "8", "9", "10"] ,
         rows: ["A", "B", "C", "D", "E", "F", "G", "H","I", "J"] ,
-        gameView: [],
+        gameView: null,
         vs: null,
         viewer: null,
     },
     methods: {
+
+        logOut: function(){
+            $.post("/api/logout").done(function() { window.location ="http://localhost:8080/web/games.html" })
+        },
+
         drawShips: function(){
             for(var i = 0; i < app.gameView.ships.length; i++){
                 for(var t = 0; t < app.gameView.ships[i].shipLocation.length; t++){
@@ -93,5 +98,6 @@ fetch(api, {
     })
     .catch(function (error) {
         console.log('Looks like there was a problem: \n', error);
+        alert("Shit happend Dude! You don't have acces")
     });
 
