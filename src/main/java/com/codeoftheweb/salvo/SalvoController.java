@@ -7,9 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+
 import static java.util.stream.Collectors.toSet;
 
                             // SalvoController es la comunicacion entre mi base de datos o back end y el front end
@@ -44,8 +43,13 @@ public class SalvoController {
     }
 
     @RequestMapping("/game_view/{gamePlayerId}")     //RUTA
-    public Map<String,Object> getGameView(@PathVariable Long gamePlayerId) {      //PathVariable dice q Spring me va a inyectar el num que salga de la ruta /game_vew/{gamePlayerId} El dato long ID
-        return gamePlayerRepository.findById(gamePlayerId.longValue()).get().gameViewDTO();
+    public ResponseEntity<Map<String, Object>> getGameView(@PathVariable Long gamePlayerId, Authentication authentication) {      //PathVariable dice q Spring me va a inyectar el num que salga de la ruta /game_vew/{gamePlayerId} El dato long ID
+        Player user = playerRepository.findByUserName(authentication.getName());            //buscamos el user logeado
+        Optional<GamePlayer> gamePlayer = gamePlayerRepository.findById(gamePlayerId.longValue());
+        if(gamePlayer.isPresent() && gamePlayer.get().getPlayer().getId() != user.getId()) {                                               //Para acceder al valor del optional necesesito el .get
+            return new ResponseEntity<>(makeMap("error","NO ACCES"), HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(makeMap("gp", gamePlayer.get().gameViewDTO()), HttpStatus.OK);
     }
 
     @RequestMapping(path = "/player", method = RequestMethod.POST)
@@ -66,5 +70,10 @@ public class SalvoController {
 
     private boolean isGuest(Authentication authentication) {
         return authentication == null || authentication instanceof AnonymousAuthenticationToken;
+    }
+    private Map<String, Object> makeMap(String key, Object value) {
+        Map<String, Object> map = new HashMap<>();
+        map.put(key, value);
+        return map;
     }
 }

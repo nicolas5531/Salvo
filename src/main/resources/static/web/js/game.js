@@ -53,7 +53,7 @@ var app = new Vue({
 
         gameInformation: function(){
             for(var i = 0; i < app.gameView.gamePlayers.length; i++){
-                if (app.gp == app.gameView.gamePlayers[i].id){
+                if (app.gp == app.gameView.gamePlayers[i].gpId){
                     app.viewer = app.gameView.gamePlayers[i].player || "???";
                 }
                 else{
@@ -84,7 +84,7 @@ fetch(api, {
         }
     })
     .then(function (data) {
-        app.gameView = data;
+        app.gameView = data.gp;
         app.gp = gp;
         app.drawShips();
         app.gameInformation();
