@@ -20,12 +20,15 @@
                         <input type="password" v-model:value="signPassword" placeholder="Password" />
                         <button class="btn btn-primary" type="button" v-on:click="register">create</button>
                         <p class="message">Already registered? <a href="#">Sign In</a></p>
-                        <button class="btn btn-success" v-on:click="logIn">login</button>
+                        <button type="button" class="btn btn-success" v-on:click="logIn">login</button>
                     </form>
                 </div>
                 <div v-if="player != 'Guest'">
+                    <button type="button" class="btn btn-outline-warning" v-on:click="newGame">New Game</button>
                     <span> {{ player.email}} </span> <button type="button" class="btn btn-outline-warning" v-on:click="logOut">SignOut</button>
+
                 </div>
+
             </div>
         </div>
 
@@ -34,6 +37,7 @@
                 <ul v-for="game in games">
                     <li v-if=" player != 'Guest' && game.gamePlayers[0].player.id == player.id ">
                         {{game.created | formatDate}} <a v-bind:href="'http://localhost:8080/web/game.html?gp='+game.gamePlayers[0].gpId" target='_blank'>{{game.gamePlayers[0].player.email}}</a>, {{game.gamePlayers[1] != null ? game.gamePlayers[1].player.email : ""}}
+                        <button type="button" class="btn btn-danger" v-on:click="deleteGame">Delete Game</button>
                     </li>
                     <li v-else-if=" player != 'Guest' && (game.gamePlayers[1] != null && game.gamePlayers[1].player.id == player.id)">
                         {{game.created | formatDate}} {{game.gamePlayers[0].player.email}}, <a v-bind:href="'http://localhost:8080/web/game.html?gp='+game.gamePlayers[1].gpId" target='_blank'>{{game.gamePlayers[1].player.email}}</a>
@@ -41,6 +45,9 @@
                     <li v-else>
                         {{game.created | formatDate}} {{game.gamePlayers[0].player.email}}, {{game.gamePlayers[1] != null ? game.gamePlayers[1].player.email : ""}}
                     </li>
+                    <span v-if=" player != 'Guest' && game.gamePlayers.length < 2 && game.gamePlayers[0].player.id != player.id ">
+                        <button type="button" class="btn btn-success" v-on:click="joinGame(game.id)">Join Game</button>
+                    </span>
                 </ul>
             </div>
             <table  class="col-5 ml-5 table table-bordered table-hover ">

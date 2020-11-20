@@ -12,6 +12,21 @@ var app = new Vue({
         isJoinGame: "",
     },
     methods:{
+        joinGame: function(gId){
+            app.gId = gId
+            $.post("/api/games/"+gId+"/players").done(function(gp) { window.location.href = "/web/game.html?gp="+gp.gpId})
+            .fail(function(){ $("#error-msg").html("This is not the way")})
+        },
+        deleteGame: function(){
+            $.delete("/api/games").done(function(gp) { window.location.href = "/web/game.html?gp="+gp.gpId})
+            .fail(function(){ $("#error-msg").html("This is not the way")})
+
+        },
+        newGame: function(){
+            $.post("/api/games").done(function(gp) { window.location.href = "/web/game.html?gp="+gp.gpId})
+            .fail(function(){ $("#error-msg").html("This is not the way")})
+
+        },
 
         register: function(){
             if(app.signUser.length != 0 && app.signPassword.length > 4){

@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.util.stream.Collectors.toSet;
@@ -42,11 +43,38 @@ public class SalvoController {
         return dto;
     }
 
+    @RequestMapping(path = "/games", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> newGame (Authentication authentication) {
+        if (isGuest(authentication)) {
+            return new ResponseEntity<>(makeMap("error", "No name"), HttpStatus.FORBIDDEN);
+        }
+
+        Player newPlayer = playerRepository.findByUserName(authentication.getName());
+        Game newGame = gameRepository.save(new Game(LocalDateTime.now()));
+        GamePlayer newGamePlayer = gamePlayerRepository.save(new GamePlayer(newPlayer, newGame));
+
+        return new ResponseEntity<>(makeMap("gpId", newGamePlayer.getId()), HttpStatus.CREATED);
+    }
+    @RequestMapping(path = "/games/{gameId}/players", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> joinGame (@PathVariable Long gameId ,Authentication authentication) {        //ASosiacion de un nuevo gp con un juego existente
+
+        if (isGuest(authentication)) {                                                              //pregunto si hay usuario log o es invitado
+            return new ResponseEntity<>(makeMap("error", "No name"), HttpStatus.UNAUTHORIZED);      //error si usuario actual es nulo
+        }
+        Optional<Game> game = gameRepository.findById(gameId.longValue());                     //id del juego al que me quiero unir
+        if(game.isEmpty()){
+            return new ResponseEntity<>(makeMap("error", "\"No such game\""), HttpStatus.FORBIDDEN);
+        }
+        Player newPlayer = playerRepository.findByUserName(authentication.getName());           //authentic guarda quien es el usuario log
+        GamePlayer newGamePlayer = gamePlayerRepository.save(new GamePlayer(newPlayer, game.get()));
+        return new ResponseEntity<>(makeMap("gpId", newGamePlayer.getId()), HttpStatus.CREATED);
+    }
     @RequestMapping("/game_view/{gamePlayerId}")     //RUTA
     public ResponseEntity<Map<String, Object>> getGameView(@PathVariable Long gamePlayerId, Authentication authentication) {      //PathVariable dice q Spring me va a inyectar el num que salga de la ruta /game_vew/{gamePlayerId} El dato long ID
-        Player user = playerRepository.findByUserName(authentication.getName());            //buscamos el user logeado
-        Optional<GamePlayer> gamePlayer = gamePlayerRepository.findById(gamePlayerId.longValue());
-        if(gamePlayer.isPresent() && gamePlayer.get().getPlayer().getId() != user.getId()) {                                               //Para acceder al valor del optional necesesito el .get
+        Player onlineUser = playerRepository.findByUserName(authentication.getName());            //buscamos el user logeado
+        Optional<GamePlayer> gamePlayer = gamePlayerRepository.findById(gamePlayerId.longValue());              //El optional nunca puede ser nullo, siempre va a llegar una caja,
+
+        if(gamePlayer.isPresent() && gamePlayer.get().getPlayer().getId() != onlineUser.getId()) {       //                               //Para acceder al valor del optional necesesito el .get/ Si no hay nada en el optional el .get genera error
             return new ResponseEntity<>(makeMap("error","NO ACCES"), HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity<>(makeMap("gp", gamePlayer.get().gameViewDTO()), HttpStatus.OK);
@@ -54,7 +82,7 @@ public class SalvoController {
 
     @RequestMapping(path = "/player", method = RequestMethod.POST)
     private ResponseEntity<Object> register(
-            @RequestParam String email, @RequestParam String password) {
+            @RequestParam String email, @RequestParam String password) {                //Requestparam decimos que va a obtener el parametro desde la uri que nosotros creamos en el front end por ejemplo.
 
         if (email.isEmpty() || password.length() < 4) {
             return new ResponseEntity<>("Missing data", HttpStatus.FORBIDDEN);

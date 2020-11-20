@@ -36,6 +36,11 @@ public class GamePlayer {
     public GamePlayer() {           //constructor por defecto ya q sino hibernate da error sin el...
     }
 
+    public GamePlayer(Player newPlayer, Game newGame) {
+        this.player = newPlayer;
+        this.game = newGame;
+    }
+
     public GamePlayer(Player player, Game game, Set<Ship> ships, Set<Salvo> salvoes) {
         this.date = LocalDateTime.now();
         this.player = player;
