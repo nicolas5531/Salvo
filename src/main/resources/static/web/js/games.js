@@ -15,16 +15,16 @@ var app = new Vue({
         joinGame: function(gId){
             app.gId = gId
             $.post("/api/games/"+gId+"/players").done(function(gp) { window.location.href = "/web/game.html?gp="+gp.gpId})
-            .fail(function(){ $("#error-msg").html("This is not the way")})
+            .fail(function(){ alert("This is not the way")})
         },
         deleteGame: function(){
             $.delete("/api/games").done(function(gp) { window.location.href = "/web/game.html?gp="+gp.gpId})
-            .fail(function(){ $("#error-msg").html("This is not the way")})
+            .fail(function(){ alert("This is not the way")})
 
         },
         newGame: function(){
             $.post("/api/games").done(function(gp) { window.location.href = "/web/game.html?gp="+gp.gpId})
-            .fail(function(){ $("#error-msg").html("This is not the way")})
+            .fail(function(){ alert("This is not the way")})
 
         },
 
