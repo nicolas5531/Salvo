@@ -29,6 +29,9 @@ public class SalvoController {
     @Autowired
     private PlayerRepository playerRepository;
 
+    @Autowired
+    private ShipRepository shipRepository;
+
     @RequestMapping("/games")    //Por defecto los mapping son de tipo get como si fuera (path =/games, method= get)/Asociamos la peticion /games a la ejecucion de getGames //método al que se llama cuando la dirección URL es /api/games.
     public Map<String, Object> getAll(Authentication authentication) {         // Hace que obtenga todos los juegos y devuelva una lista de los ID.
         Player user = null;     //
@@ -75,7 +78,7 @@ public class SalvoController {
         Optional<GamePlayer> gamePlayer = gamePlayerRepository.findById(gamePlayerId.longValue());              //El optional nunca puede ser nullo, siempre va a llegar una caja,
 
         if(gamePlayer.isPresent() && gamePlayer.get().getPlayer().getId() != onlineUser.getId()) {       //                               //Para acceder al valor del optional necesesito el .get/ Si no hay nada en el optional el .get genera error
-            return new ResponseEntity<>(makeMap("error","NO ACCES"), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(makeMap("error","NO ACCESS"), HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity<>(makeMap("gp", gamePlayer.get().gameViewDTO()), HttpStatus.OK);
     }
@@ -94,6 +97,40 @@ public class SalvoController {
 
         playerRepository.save(new Player(email, passwordEncoder.encode(password)));
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/games/players/{gamePlayerId}/ships")
+    public ResponseEntity<Map<String, Object>> newShips (Authentication authentication, @PathVariable Long gamePlayerId, @RequestBody Set<Ship> ships) {  //Digo QUE voy a retornar en la funcion newShips
+                                                                                                        //RequestBody spring va a intentar sacar del request body la lista de naves
+
+        if (isGuest(authentication)) {
+            return new ResponseEntity<>(makeMap("error", "not logged in"), HttpStatus.UNAUTHORIZED);
+        }
+
+        Player onlineUser = playerRepository.findByUserName(authentication.getName());            //buscamos el user logeado
+        Optional<GamePlayer> gamePlayer = gamePlayerRepository.findById(gamePlayerId);                     //id del gPlayer al que quiero poner las naves
+
+        if(gamePlayer.isEmpty()) {                                      // Si esta vacio entra el error
+            return new ResponseEntity<>(makeMap("error","not game player"), HttpStatus.UNAUTHORIZED);
+        }
+
+        if(gamePlayer.get().getPlayer().getId() != onlineUser.getId()){         //comparo si corresponde el usuario log con el jugador q corresp al gam play
+            return new ResponseEntity<>(makeMap("error","NO ACCESS "), HttpStatus.FORBIDDEN);
+        }
+
+        if(gamePlayer.get().getShips().size() > 0 ) {                                      //Para acceder al valor del optional necesesito el .get/ Si no hay nada en el optional el .get genera error
+            return new ResponseEntity<>(makeMap("error","ships already placed or too many ships"), HttpStatus.FORBIDDEN);
+        }
+
+        if(gamePlayer.get().getShips().size() != 5) {                                      //Para acceder al valor del optional necesesito el .get/ Si no hay nada en el optional el .get genera error
+            return new ResponseEntity<>(makeMap("error","You can add 5 ships, no more, no less."), HttpStatus.FORBIDDEN);
+        }
+        ships.forEach((ship)-> {
+            gamePlayer.get().addShip(ship);
+        });
+
+        gamePlayerRepository.save(gamePlayer.get());
+        return new ResponseEntity<>(makeMap("success", "ships added"), HttpStatus.CREATED);
     }
 
     private boolean isGuest(Authentication authentication) {

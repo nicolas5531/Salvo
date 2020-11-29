@@ -55,6 +55,11 @@ public class GamePlayer {
         });
     }
 
+    public void addShip(Ship ship) {
+        ship.setGamePlayer(this);
+        ships.add(ship);
+    }
+
     public Map<String, Object> toDTO() {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("gpId", id);

@@ -13,6 +13,32 @@ var app = new Vue({
         viewer: null,
     },
     methods: {
+        addShips: function(gpId){
+            $.post({
+              url: "/api/games/players/"+gpId+"/ships",
+              data: JSON.stringify([
+              {
+              "type": "Patrol Boat",
+              "locations":["H1", "H2"]},
+              {"type": "Destroyer", "locations":["F1", "F2", "F3"]},
+              {"type": "Submarine",
+              "locations":["A2", "B2", "C2"]},
+              {"type": "Battleship",
+              "locations":["A8", "B8", "C8", "D8"]},
+              {"type": "Carrier",
+              "locations":["A10", "B10", "C10", "D10", "E10"]},
+              ]),
+              dataType: "text",
+              contentType: "application/json"
+            })
+            .done(function () {
+                location.reload()
+                alert( "Ship added " + response );
+            })
+            .fail(function (jqXHR, status, httpError) {
+                alert("Failed to add Ship: " + status + " " + httpError);
+            })
+        },
 
         logOut: function(){
             $.post("/api/logout").done(function() { window.location ="http://localhost:8080/web/games.html" })

@@ -13,7 +13,7 @@ var app = new Vue({
     },
     methods:{
         joinGame: function(gId){
-            app.gId = gId
+
             $.post("/api/games/"+gId+"/players").done(function(gp) { window.location.href = "/web/game.html?gp="+gp.gpId})
             .fail(function(){ alert("This is not the way")})
         },
