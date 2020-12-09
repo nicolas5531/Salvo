@@ -1,3 +1,6 @@
+.alerts{
+    background-color: red;
+}
 .login-page {
   width: 360px;
   padding: 8% 0 0;
@@ -58,14 +61,18 @@
     background-size: cover;
     background-attachment: local;
 }
+.tableShips{
+    color: white;
+    background-color: black;
+    text-align: center;
+}
 .ship{
     background-image: url(./images/barco.png);
     background-size: cover;
     background-attachment: local;
 }
-.rowColumn{
-        background-image: url(./images/background-1172581_960_720.webp);
-
+.column:hover{
+    background-color: gold;
 }
 .rColumn1{
         background-image: url(./images/source22.gif);

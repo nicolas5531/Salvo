@@ -6,37 +6,151 @@ var app = new Vue({
     el: "#app",
     data: {
         gp: null,
-        columns: ["1", "2", "3", "4","5", "6", "7", "8", "9", "10"] ,
+        columns: [1, 2, 3, 4,5, 6, 7, 8, 9, 10] ,
         rows: ["A", "B", "C", "D", "E", "F", "G", "H","I", "J"] ,
         gameView: null,
         vs: null,
         viewer: null,
+        ships: [],
+        position: "vertical",
+        shipSelected: "",
+        shipProvisionalPosition: null,
+        row: null,
+        col:null,
+        newGame:"" ,
+
     },
     methods: {
+        newShip: function(row, column){
+            if(app.shipSelected == ""){
+                alert("Please select ships and position");
+            }
+            else{
+                app.row = row;
+                app.col = column;
+                if((app.ships.findIndex(ship => ship.type === app.shipSelected) != -1)){        //ship representa el index => shipe.type la propiedad a la que quiero accedeer para comparar
+                    app.borraShips();                                                           //  Check si la nave ya esta colocada
+                    app.dibujaShips();
+                }
+                else{
+                    app.dibujaShips();
+                }
+            }
+        },
+
+        borraShips: function(){
+            let celdas = 0;
+            if(app.shipSelected == "Carrier"){
+                celdas = 5;
+            }
+            if(app.shipSelected == "Battleship"){
+                celdas = 4;
+            }
+            if(app.shipSelected == "Submarine"){
+                celdas = 3;
+            }
+            if(app.shipSelected == "Destroyer"){
+                celdas = 3;
+            }
+            if(app.shipSelected == "Patrol Boat"){
+                celdas = 2;
+            }
+            if(app.position == "horizontal"){
+                var ship = {"type": app.shipSelected, "locations":[]};
+                var index = app.ships.findIndex(shipp => shipp.type === app.shipSelected);
+                for(var i = 0; i < app.ships[index].locations.length ; i++){
+                    document.getElementById(app.ships[index].locations[i]).classList.remove('ship');
+                }
+                app.ships.splice(index,1);
+            }
+            if(app.position == "vertical"){
+                var ship = {"type": app.shipSelected, "locations":[]};
+                var index = app.ships.findIndex(ship => ship.type === app.shipSelected);
+                for(var i = 0; i < app.ships[index].locations.length ; i++){
+                    document.getElementById(app.ships[index].locations[i]).classList.remove('ship');
+                }
+                app.ships.splice(index,1);
+            }
+        },
+
+        dibujaShips: function(){
+            let celdas = 0;
+            if(app.shipSelected == "Carrier"){
+                celdas = 5;
+            }
+            else if(app.shipSelected == "Battleship"){
+                celdas = 4;
+            }
+            else if(app.shipSelected == "Submarine"){
+                celdas = 3;
+            }
+            else if(app.shipSelected == "Destroyer"){
+                celdas = 3;
+            }
+            else if(app.shipSelected == "Patrol Boat"){
+                celdas = 2;
+            }
+            if(app.position == "horizontal"){
+                var ship = {"type": app.shipSelected, "locations":[]};
+                if(app.col + celdas <= 11){
+                     for(var i = 0; i < celdas; i++){
+                        ship.locations.push(app.row + app.col);
+                        app.col++;
+                    }
+                    var index = app.ships.findIndex(nave => nave.locations.findIndex(loc => ship.locations.includes(loc)) >= 0 )   //id de la Nave que se intercepta con otra
+                    if(index != -1){
+                        alert("You 've another ship in that place");
+                    }
+                    else{
+                        for(var i = 0; i < ship.locations.length; i++){
+                            document.getElementById(ship.locations[i]).classList.add('ship');
+                        }
+                        app.ships.push(ship);
+                    }
+                }
+                else{
+                    alert("You are out of the grid my friend!")
+                }
+            }
+            else if(app.position == "vertical"){
+                var ship = {"type": app.shipSelected, "locations":[]};
+                var indice = app.rows.indexOf(app.row);
+                if((indice + 1) + celdas <= 11){
+                    for(var i = 0; i < celdas; i++){
+                        ship.locations.push(app.rows[indice] + app.col);
+                        indice++;
+                    }
+                    var index = app.ships.findIndex(nave => nave.locations.findIndex(loc => ship.locations.includes(loc)) >= 0 )   //id de la Nave que se intercepta con otra
+                    if(index != -1){
+                        alert("You 've another ship in that place");
+                    }
+                    else{
+                        for(var i = 0; i < ship.locations.length; i++){
+                            document.getElementById(ship.locations[i]).classList.add('ship');
+                        }
+                        app.ships.push(ship);
+                    }
+                }
+                else{
+                    alert("You are out of the grid my friend!")
+                }
+            }
+        },
+
         addShips: function(gpId){
             $.post({
               url: "/api/games/players/"+gpId+"/ships",
-              data: JSON.stringify([
-              {
-              "type": "Patrol Boat",
-              "locations":["H1", "H2"]},
-              {"type": "Destroyer", "locations":["F1", "F2", "F3"]},
-              {"type": "Submarine",
-              "locations":["A2", "B2", "C2"]},
-              {"type": "Battleship",
-              "locations":["A8", "B8", "C8", "D8"]},
-              {"type": "Carrier",
-              "locations":["A10", "B10", "C10", "D10", "E10"]},
-              ]),
+              data: JSON.stringify(app.ships),
               dataType: "text",
-              contentType: "application/json"
+              contentType: "application/json",
+
             })
             .done(function () {
                 location.reload()
                 alert( "Ship added " + response );
             })
-            .fail(function (jqXHR, status, httpError) {
-                alert("Failed to add Ship: " + status + " " + httpError);
+            .fail(function (error) {
+                alert("Failed to add Ship:" + error.responseText);
             })
         },
 
@@ -120,6 +234,7 @@ fetch(api, {
         app.drawShips();
         app.gameInformation();
         app.drawSalvoesVs();
+        app.newGame = app.gameView.ships;
         
     })
     .catch(function (error) {

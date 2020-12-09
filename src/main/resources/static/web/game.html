@@ -33,11 +33,11 @@
                 <tbody>
                     <tr v-for="row in rows">
                         <th class="rowColumn">{{ row }}</th>
-                        <td v-for="column in columns" v-bind:id= "row + column">{{  }}</td>
+                        <td class="column" v-on:click="newShip(row , column)" v-for="column in columns" v-bind:id= "row + column"> </td>
                     </tr>
                 </tbody>
             </table>
-            <button type="button" class="btn btn-outline-success" data-toggle="modal" data-target="#exampleModal">Save Ships</button>
+            <button v-show="newGame.length != 5" type="button" class="btn btn-outline-success" data-toggle="modal" data-target="#exampleModal">Save Ships</button>
             <!-- Modal -->
             <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -53,25 +53,75 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" v-on:click="addShips(gp)">Save changes</button>
+                            <button  type="button" class="btn btn-primary" v-on:click="addShips(gp)">Save changes</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <table id="tableSalvoes" class="col-5 ml-5 table table-bordered table-hover ">
-                <thead>
-                <tr>
-                    <th class="rColumn1"> </th>
-                    <th class="rowColumn" v-for="column in columns"> {{ column }} </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="row in rows">
-                    <th class="rowColumn">{{ row }}</th>
-                    <td v-for="column in columns" v-bind:id= "row + column + 's'">{{  }}</td>
-                </tr>
-                </tbody>
-            </table>
+            <div v-show="gameView != null && gameView.ships.length != 5">
+                <table class="tableShips col-5 ml-5 table table-bordered table-hover ">
+                    <thead>
+                        <tr>
+                            <th> Number </th>
+                            <th> Type </th>
+                            <th> Length </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th>{{ ships.findIndex(ship => ship.type === "Carrier") != -1 ? 0 : 1 }} </th>
+                            <td><input type="radio" id="Carrier" value="Carrier" v-model="shipSelected">
+                                <label for="Carrier">Carrier</label></td>
+                            <th>5</th>
+                        </tr>
+                        <tr>
+                            <th>{{ ships.findIndex(ship => ship.type === "Battleship") != -1 ? 0 : 1 }}</th>
+                            <td><input type="radio" id="Battleship" value="Battleship" v-model="shipSelected">
+                                <label for="Battleship">Battleship</label></td>
+                            <th>4</th>
+                        </tr>
+                        <tr>
+                            <th>{{ ships.findIndex(ship => ship.type === "Submarine") != -1 ? 0 : 1 }}</th>
+                            <td><input type="radio" id="Submarine" value="Submarine" v-model="shipSelected">
+                                <label for="Submarine">Submarine</label></td>
+                            <th>3</th>
+                        </tr>
+                        <tr>
+                            <th>{{ ships.findIndex(ship => ship.type === "Destroyer") != -1 ? 0 : 1 }}</th>
+                            <td><input type="radio" id="Destroyer" value="Destroyer" v-model="shipSelected">
+                                <label for="Destroyer">Destroyer</label></td>
+                            <th>3</th>
+                        </tr>
+                        <tr>
+                            <th>{{ ships.findIndex(ship => ship.type === "Patrol Boat") != -1 ? 0 : 1 }}</th>
+                            <td><input type="radio" id="PatrolBoat" value="Patrol Boat" v-model="shipSelected">
+                                <label for="PatrolBoat">Patrol Boat</label> </td>
+                            <th>2</th>
+                        </tr>
+                    </tbody>
+                </table>
+                <input type="radio" id="vertical" value="vertical" v-model="position">
+                <label for="vertical">Vertical</label>
+                <br>
+                <input type="radio" id="horizontal" value="horizontal" v-model="position">
+                <label for="horizontal">Horizontal</label>
+            </div>
+            <div v-show="vs != null">
+                <table id="tableSalvoes" class="col-5 ml-5 table table-bordered table-hover ">
+                    <thead>
+                    <tr>
+                        <th class="rColumn1"> </th>
+                        <th class="rowColumn" v-for="column in columns"> {{ column }} </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="row in rows">
+                        <th class="rowColumn">{{ row }}</th>
+                        <td v-for="column in columns" v-bind:id= "row + column + 's'">{{  }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
             <iframe class="ml-5 col-12" src="https://open.spotify.com/embed/artist/432R46LaYsJZV2Gmc4jUV5" width="300" height="200" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
         </div>
     </div>

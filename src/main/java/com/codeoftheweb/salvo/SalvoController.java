@@ -122,8 +122,8 @@ public class SalvoController {
             return new ResponseEntity<>(makeMap("error","ships already placed or too many ships"), HttpStatus.FORBIDDEN);
         }
 
-        if(gamePlayer.get().getShips().size() != 5) {                                      //Para acceder al valor del optional necesesito el .get/ Si no hay nada en el optional el .get genera error
-            return new ResponseEntity<>(makeMap("error","You can add 5 ships, no more, no less."), HttpStatus.FORBIDDEN);
+        if(ships.size() != 5 ) {                                      //Para acceder al valor del optional necesesito el .get/ Si no hay nada en el optional el .get genera error
+            return new ResponseEntity<>(makeMap("error","You should add 5 ships, no more, no less."), HttpStatus.FORBIDDEN);
         }
         ships.forEach((ship)-> {
             gamePlayer.get().addShip(ship);
