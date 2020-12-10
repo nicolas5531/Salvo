@@ -32,6 +32,9 @@ public class SalvoController {
     @Autowired
     private ShipRepository shipRepository;
 
+    @Autowired
+    private SalvoRepository salvoRepository;
+
     @RequestMapping("/games")    //Por defecto los mapping son de tipo get como si fuera (path =/games, method= get)/Asociamos la peticion /games a la ejecucion de getGames //método al que se llama cuando la dirección URL es /api/games.
     public Map<String, Object> getAll(Authentication authentication) {         // Hace que obtenga todos los juegos y devuelva una lista de los ID.
         Player user = null;     //
@@ -132,6 +135,37 @@ public class SalvoController {
         gamePlayerRepository.save(gamePlayer.get());
         return new ResponseEntity<>(makeMap("success", "ships added"), HttpStatus.CREATED);
     }
+
+    @PostMapping("/games/players/{gamePlayerId}/salvoes")
+    public ResponseEntity<Object> newSalvoes (Authentication authentication, @PathVariable Long gamePlayerId, @RequestBody Salvo salvo) {  //Digo QUE voy a retornar en la funcion newShips
+        //RequestBody spring va a intentar sacar del request body la lista de naves
+
+        if (isGuest(authentication)) {
+            return new ResponseEntity<>("not logged in", HttpStatus.UNAUTHORIZED);
+        }
+
+        Player onlineUser = playerRepository.findByUserName(authentication.getName());            //buscamos el user logeado
+        Optional<GamePlayer> gamePlayer = gamePlayerRepository.findById(gamePlayerId);                     //id del gPlayer al que quiero poner las naves optional es pq findById retorna un opcional ya que puede que encduentre o no el id (para q nunca tengamos un nulo)
+
+        if(gamePlayer.isEmpty()) {                                      // Si esta vacio entra el error
+            return new ResponseEntity<>("not game player", HttpStatus.UNAUTHORIZED);
+        }
+
+        if(gamePlayer.get().getPlayer().getId() != onlineUser.getId()){         //comparo si corresponde el usuario log con el jugador q corresp al gam play
+            return new ResponseEntity<>("NO ACCESS ", HttpStatus.FORBIDDEN);
+        }
+
+        if(salvo.getLocations().size() != 5 ) {                                      //Para acceder al valor del optional necesesito el .get/ Si no hay nada en el optional el .get genera error
+            return new ResponseEntity<>(makeMap("error","You should add 5 salvoes, no more, no less."), HttpStatus.FORBIDDEN);
+        }
+        if(salvo.getTurn() -1 != gamePlayer.get().getSalvoes().size() ) {                                      //Para acceder al valor del optional necesesito el .get/ Si no hay nada en el optional el .get genera error
+            return new ResponseEntity<>(makeMap("error","You should add 5 salvoes, no more, no less."), HttpStatus.FORBIDDEN);
+        }
+        salvo.setGamePlayer(gamePlayer.get());
+        salvoRepository.save(salvo);
+        return new ResponseEntity<>( "salvoes added", HttpStatus.CREATED);
+    }
+
 
     private boolean isGuest(Authentication authentication) {
         return authentication == null || authentication instanceof AnonymousAuthenticationToken;

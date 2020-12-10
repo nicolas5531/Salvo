@@ -17,8 +17,8 @@ var app = new Vue({
         shipProvisionalPosition: null,
         row: null,
         col:null,
-        newGame:"" ,
-
+        newGame:"",
+        salvoes: {"turn": 0, "locations":[]},
     },
     methods: {
         newShip: function(row, column){
@@ -36,6 +36,30 @@ var app = new Vue({
                     app.dibujaShips();
                 }
             }
+        },
+        newSalvo: function(row, column){
+            app.row = row;
+            app.col = column;
+            let index = app.salvoes.locations.indexOf(row + column);
+            let playerSalvoes = app.gameView.salvoes.filter(salvo => salvo.player == app.viewer.id);
+
+            if(app.salvoes.locations.includes(row + column) == true){
+                document.getElementById(row + column + 's').classList.remove('salvo');
+                app.salvoes.locations.splice(index,1);
+            }
+            else if(playerSalvoes.findIndex(salvo => salvo.salvoLocations.includes(row + column)) != -1 ){
+                alert("You already have a shot here")
+            }
+            else if(app.salvoes.locations.length < 5){
+                document.getElementById(row + column + 's').classList.add('salvo');
+                app.salvoes.locations.push(row + column);
+            }
+            else{alert("YOU JUST HAVE 5 SHOTS")}
+        },
+
+        calcularTurno: function(){
+            let playerSalvoes = app.gameView.salvoes.filter(salvo => salvo.player == app.viewer.id);
+            app.salvoes.turn = playerSalvoes.length +1;
         },
 
         borraShips: function(){
@@ -61,7 +85,7 @@ var app = new Vue({
                 for(var i = 0; i < app.ships[index].locations.length ; i++){
                     document.getElementById(app.ships[index].locations[i]).classList.remove('ship');
                 }
-                app.ships.splice(index,1);
+                app.ships.splice(index,1);      //elimino 1 array en la posicion dada por index
             }
             if(app.position == "vertical"){
                 var ship = {"type": app.shipSelected, "locations":[]};
@@ -136,7 +160,23 @@ var app = new Vue({
                 }
             }
         },
+        addSalvoes: function(gpId){
+            app.calcularTurno();
+            $.post({
+              url: "/api/games/players/"+gpId+"/salvoes",
+              data: JSON.stringify(app.salvoes),
+              dataType: "text",
+              contentType: "application/json",
 
+            })
+            .done(function (response) {
+                alert( response );
+                location.reload();
+            })
+            .fail(function (error) {
+                alert("Failed to add Salvoes:" + error);
+            })
+        },
         addShips: function(gpId){
             $.post({
               url: "/api/games/players/"+gpId+"/ships",
@@ -145,9 +185,9 @@ var app = new Vue({
               contentType: "application/json",
 
             })
-            .done(function () {
+            .done(function (response) {
+                alert( "Ship added " );
                 location.reload()
-                alert( "Ship added " + response );
             })
             .fail(function (error) {
                 alert("Failed to add Ship:" + error.responseText);
@@ -235,10 +275,13 @@ fetch(api, {
         app.gameInformation();
         app.drawSalvoesVs();
         app.newGame = app.gameView.ships;
+
         
     })
     .catch(function (error) {
         console.log('Looks like there was a problem: \n', error);
-        alert("Shit happend Dude! You don't have acces")
+        alert("Shit happend Dude! You don't have acces");
+        window.location.href = "/web/games.html";
+
     });
 

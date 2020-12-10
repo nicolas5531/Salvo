@@ -59,6 +59,10 @@ public class GamePlayer {
         ship.setGamePlayer(this);
         ships.add(ship);
     }
+    public void addSalvo(Salvo salvo) {
+        salvo.setGamePlayer(this);
+        salvoes.add(salvo);
+    }
 
     public Map<String, Object> toDTO() {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
@@ -115,9 +119,9 @@ public class GamePlayer {
         this.ships = ships;
     }
 
-    public Set<Salvo> getSalvoes(Salvo salvo) {
-        return salvoes;
-    }
+    //public Set<Salvo> getSalvoes(Salvo salvo) {
+    //    return salvoes;
+    //}
 
     public Set<Salvo> getSalvoes() {
         return salvoes;

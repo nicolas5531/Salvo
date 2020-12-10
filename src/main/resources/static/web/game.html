@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -117,10 +117,12 @@
                     <tbody>
                     <tr v-for="row in rows">
                         <th class="rowColumn">{{ row }}</th>
-                        <td v-for="column in columns" v-bind:id= "row + column + 's'">{{  }}</td>
+                        <td data-toggle="tooltip" data-placement="top" v-bind:title="row + column" class="column" v-on:click="newSalvo(row , column)" v-for="column in columns" v-bind:id= "row + column + 's'">{{  }}</td>
                     </tr>
                     </tbody>
                 </table>
+                <button  type="button" class="btn btn-primary" v-on:click="addSalvoes(gp)">Save changes</button>
+
             </div>
             <iframe class="ml-5 col-12" src="https://open.spotify.com/embed/artist/432R46LaYsJZV2Gmc4jUV5" width="300" height="200" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
         </div>
