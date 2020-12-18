@@ -7,8 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDateTime;
-import java.util.*;
 
 @SpringBootApplication					//Le decimos de cierta manera que cree el application context
 public class SalvoApplication {			//Es la clase principal de nuestra app
@@ -24,7 +22,7 @@ public class SalvoApplication {			//Es la clase principal de nuestra app
 		return (args) -> {
 			// save a couple of customers
 			//PLAYER
-			Player player1 = new Player ("j.bauer@ctu.gov", passwordEncoder.encode("242424"));
+			/*Player player1 = new Player ("j.bauer@ctu.gov", passwordEncoder.encode("242424"));
 			playerRepository.save(player1);
 
 			Player player2 = new Player ("c.obrian@ctu.gov", passwordEncoder.encode("424242"));
@@ -206,7 +204,7 @@ public class SalvoApplication {			//Es la clase principal de nuestra app
 
 			GamePlayer gamePlayer11 = new GamePlayer(player4, game6, ships6,salvoes11);
 			gamePlayerRepository.save(gamePlayer11);
-
+*/
 		};
 	}
 }

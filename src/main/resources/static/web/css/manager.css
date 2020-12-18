@@ -1,8 +1,12 @@
-
+.games{
+    background-image: url(./images/futur.jpg);
+    background-size: fixed;
+}
 .login-page {
   width: 360px;
   padding: 8% 0 0;
   margin: auto;
+
 }
 .form input {
   font-family: "Roboto", sans-serif;
@@ -49,6 +53,10 @@
   padding: 45px;
   text-align: center;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+  background-color: rgb(254,106,118);
+  opacity: 0.9;
+
+
 }
 
 #table{
@@ -95,6 +103,15 @@
 
     opacity: 0.9
 }
+.salvoHit{
+    background-image: url(./images/fuegogiphy.gif);
+    background-size: cover;
+}
+.salvoSunken{
+    background-image: url(./images/explosiongiphy.gif);
+    background-size: cover;
+}
+
 .salvoWater{
     background-color: blue;
 

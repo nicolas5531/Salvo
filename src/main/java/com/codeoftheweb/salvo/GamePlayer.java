@@ -3,10 +3,8 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 
 @Entity
 public class GamePlayer {
@@ -64,7 +62,16 @@ public class GamePlayer {
         salvoes.add(salvo);
     }
 
-    public Map<String, Object> toDTO() {
+    public Optional<GamePlayer> getOpponent(){
+        return this.game.getGamePlayers()
+                //Stream seria como una analogia que representa un espacio de trabajo
+                .stream()
+                .filter(gp -> gp.getId() != this.id)
+                .findFirst();
+
+    }
+
+    public Map<String, Object> gamePlayerDTO() {
         Map<String, Object> dto = new LinkedHashMap<String, Object>();
         dto.put("gpId", id);
         dto.put("player", player.toDTO());
@@ -76,15 +83,80 @@ public class GamePlayer {
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("id", this.game.getId());
         dto.put("created", this.game.getDate());
-        dto.put("gamePlayers", this.game.getGamePlayers().stream().map(GamePlayer :: toDTO));
-        dto.put("ships", this.ships.stream().map(Ship::shipDTO));
+        dto.put("gamePlayers", this.game.getGamePlayers().stream()
+                .map(GamePlayer :: gamePlayerDTO));
+        dto.put("ships", this.ships.stream()
+                .map(Ship::shipDTO));
         dto.put("salvoes", this.game.getGamePlayers().stream()
                 .flatMap(gamePlayer -> gamePlayer.getSalvoes()
-                        .stream().map(Salvo::salvoDTO)));       //hago doble map pq traigo 2 players y el
+                .stream().map(Salvo::salvoDTO)));                           //hago doble map pq traigo 2 players y el
+        // damage done to the enemy
+        dto.put("hits", this.salvoes.stream().map(Salvo::salvoHitDTO));
+        dto.put("sunken", this.getSalvoes().stream().map(Salvo::salvoSunkenDTO));
+
+        // damage done by the enemy, to the gamePlayer
+        Optional<GamePlayer> opponent = this.getOpponent();
+
+        if(opponent.isPresent()) {
+            dto.put("enemyHits", opponent.get().getSalvoes().stream().map(Salvo::salvoHitDTO));
+            dto.put("enemySunken", opponent.get().getSalvoes().stream().map(Salvo::salvoSunkenDTO));
+        } else {
+            // array vacío es mejor para trabajar con forEach en el front end
+            // sin necesitar el "if == null"
+            dto.put("enemyHits", new ArrayList<>());
+            dto.put("enemySunken", new ArrayList<>());
+        }
+        dto.put("status", this.getGameStatus());
         return dto;                                                        // flatmap es para evitar el map superior y solo me
     };                                                            //  devuelva un resultado final...
-//flatMap arreglo multidimensional?? Reordena el arreglo para ubicarlo en un solo nivel sino tendria todos los objetos en diferentes niveles
-    //Entonces flatMap es una combinacion de flat q aplana el arreglo y map que lo mapea para convertirlo en un nuevo arreglo plano...
+        //flatMap arreglo multidimensional?? Reordena el arreglo para ubicarlo en un solo nivel sino tendria todos los objetos en diferentes niveles
+        //Entonces flatMap es una combinacion de flat q aplana el arreglo y map que lo mapea para convertirlo en un nuevo arreglo plano...
+
+    public String getGameStatus(){
+        Optional<GamePlayer> opponent = this.getOpponent();
+        Optional<Salvo> lastSalvo = this.salvoes.stream().filter(salvo -> salvo.getTurn() == this.salvoes.size()).findFirst();
+
+        if(this.ships.isEmpty()){
+            return "PLACE_SHIPS";
+        }else if(opponent.isEmpty()){
+            return "WAIT_OPPONENT";
+        }else{
+            Optional<Salvo> lastSalvoOpponent = opponent.get().salvoes.stream().filter(salvo -> salvo.getTurn() == opponent.get().salvoes.size()).findFirst();
+            int turno = 0;
+            int sunks = 0;
+            int turnoOpponet = 0;
+            int sunksOpponent = 0;
+            if(lastSalvo.isPresent()){
+                turno = lastSalvo.get().getTurn();
+                sunks = lastSalvo.get().getSunkenShips().size();
+            };
+            if(lastSalvoOpponent.isPresent()) {
+                turnoOpponet = lastSalvoOpponent.get().getTurn();
+                sunksOpponent = lastSalvoOpponent.get().getSunkenShips().size();
+            };
+
+            if(turno < turnoOpponet){
+                return "FIRE";
+            }else if(turno > turnoOpponet){
+                return "WAIT";
+            }else {
+                if(sunks < 5 && sunksOpponent == 5){
+                    return "LOST";
+                }else if (sunks == 5  && sunksOpponent < 5){
+                    return "WIN";
+                }else if(sunks == 5 && sunksOpponent == 5){
+                    return "TIE";
+                }else{
+                    if(this.id < opponent.get().getId()){
+                        return "FIRE";
+                    }else{
+                        return "WAIT";
+                    }
+                }
+            }
+        }
+    };
+
     //Getter & Setters
 
     public Set<Ship> getShips() {
@@ -134,6 +206,7 @@ public class GamePlayer {
     public Score getScore(){
         return player.getScoreGame(game);
     }
+
 
 }
 

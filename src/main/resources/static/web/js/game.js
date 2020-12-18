@@ -21,6 +21,15 @@ var app = new Vue({
         salvoes: {"turn": 0, "locations":[]},
     },
     methods: {
+
+        refreshPage: function(){                                //recarga pagina si esta esperando que dispare oponente
+
+            if(app.gameView != null && (app.gameView.status == 'WAIT' || app.gameView.status == 'WAIT_OPPONENT')){
+                setTimeout(function(){document.location.reload()},10000);
+
+            }
+        },
+
         newShip: function(row, column){
             if(app.shipSelected == ""){
                 alert("Please select ships and position");
@@ -174,7 +183,7 @@ var app = new Vue({
                 location.reload();
             })
             .fail(function (error) {
-                alert("Failed to add Salvoes:" + error);
+                alert("Failed to add Salvoes:" + error.responseText);
             })
         },
         addShips: function(gpId){
@@ -217,13 +226,55 @@ var app = new Vue({
             }
             return hitFound;
         },
-        
+
+        shipLeft: function(){
+            for(var i = 0; i < app.gameView.sunken.length; i++){
+                for(var t = 0; t < app.gameView.sunken[i].sunken.length; t++){
+                    if(app.gameView.sunken != null && app.gameView.sunken[i].sunken[t].type == "Carrier" ){
+                        document.getElementById("1").classList.add('salvoDamage');
+                    }
+                    if(app.gameView.sunken != null && app.gameView.sunken[i].sunken[t].type == "Battleship" ){
+                        document.getElementById("2").classList.add('salvoDamage');
+                    }
+                    if(app.gameView.sunken != null && app.gameView.sunken[i].sunken[t].type == "Destroyer" ){
+                        document.getElementById("3").classList.add('salvoDamage');
+                    }
+                    if(app.gameView.sunken != null && app.gameView.sunken[i].sunken[t].type == "Submarine" ){
+                        document.getElementById("4").classList.add('salvoDamage');
+                    }
+                    if(app.gameView.sunken != null && app.gameView.sunken[i].sunken[t].type == "Patrol Boat" ){
+                        document.getElementById("5").classList.add('salvoDamage');
+                    }
+                }
+            }
+        },
+
+        drawSunkViewer: function(){
+            for(var i = 0; i < app.gameView.sunken.length; i++){
+                for(var t = 0; t < app.gameView.sunken[i].sunken.length; t++){
+                    for(var k = 0; k < app.gameView.sunken[i].sunken[t].shipLocation.length; k++){
+                        document.getElementById(app.gameView.sunken[i].sunken[t].shipLocation[k] + "s").classList.remove('salvoHit');
+                        document.getElementById(app.gameView.sunken[i].sunken[t].shipLocation[k] + "s").classList.add('salvoSunken');
+                    }
+                }
+            }
+        },
+
+        drawHitViewer: function(){
+            for(var i = 0; i < app.gameView.hits.length; i++){
+                for(var t = 0; t < app.gameView.hits[i].hits.length; t++){
+                    document.getElementById(app.gameView.hits[i].hits[t] + "s").classList.remove('salvoWater');
+                    document.getElementById(app.gameView.hits[i].hits[t] + "s").classList.add('salvoHit');
+                }
+            }
+        },
+
         drawSalvoesVs: function(){
             for(var i = 0; i < app.gameView.salvoes.length; i++){
                 for(var t = 0; t < app.gameView.salvoes[i].salvoLocations.length; t++){
                     if(app.gameView.salvoes[i].player != app.viewer.id){        //oponente
                          if(app.isHit(app.gameView.salvoes[i].salvoLocations[t])){
-                             document.getElementById(app.gameView.salvoes[i].salvoLocations[t]).classList.add('salvoDamage');
+                             document.getElementById(app.gameView.salvoes[i].salvoLocations[t]).classList.add('salvoHit');
                          }
                          else{
                              document.getElementById(app.gameView.salvoes[i].salvoLocations[t]).classList.add('salvoWater');
@@ -247,6 +298,7 @@ var app = new Vue({
             }
         },
     },
+
     filters: {
       formatDate: function (value) {
         if (!value) return ''           //valida
@@ -271,17 +323,19 @@ fetch(api, {
     .then(function (data) {
         app.gameView = data.gp;
         app.gp = gp;
-        app.drawShips();
         app.gameInformation();
         app.drawSalvoesVs();
+        app.drawHitViewer();
+        app.drawSunkViewer();
+        app.shipLeft();
+        app.drawShips();
+        app.refreshPage();
         app.newGame = app.gameView.ships;
-
-        
     })
     .catch(function (error) {
         console.log('Looks like there was a problem: \n', error);
         alert("Shit happend Dude! You don't have acces");
-        window.location.href = "/web/games.html";
+        //window.location.href = "/web/games.html";
 
     });
 

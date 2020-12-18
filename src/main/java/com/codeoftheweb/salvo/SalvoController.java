@@ -35,6 +35,9 @@ public class SalvoController {
     @Autowired
     private SalvoRepository salvoRepository;
 
+    @Autowired
+    private  ScoreRepository scoreRepository;
+
     @RequestMapping("/games")    //Por defecto los mapping son de tipo get como si fuera (path =/games, method= get)/Asociamos la peticion /games a la ejecucion de getGames //método al que se llama cuando la dirección URL es /api/games.
     public Map<String, Object> getAll(Authentication authentication) {         // Hace que obtenga todos los juegos y devuelva una lista de los ID.
         Player user = null;     //
@@ -61,6 +64,7 @@ public class SalvoController {
 
         return new ResponseEntity<>(makeMap("gpId", newGamePlayer.getId()), HttpStatus.CREATED);
     }
+
     @RequestMapping(path = "/games/{gameId}/players", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> joinGame (@PathVariable Long gameId ,Authentication authentication) {        //ASosiacion de un nuevo gp con un juego existente
 
@@ -75,6 +79,7 @@ public class SalvoController {
         GamePlayer newGamePlayer = gamePlayerRepository.save(new GamePlayer(newPlayer, game.get()));
         return new ResponseEntity<>(makeMap("gpId", newGamePlayer.getId()), HttpStatus.CREATED);
     }
+
     @RequestMapping("/game_view/{gamePlayerId}")     //RUTA
     public ResponseEntity<Map<String, Object>> getGameView(@PathVariable Long gamePlayerId, Authentication authentication) {      //PathVariable dice q Spring me va a inyectar el num que salga de la ruta /game_vew/{gamePlayerId} El dato long ID
         Player onlineUser = playerRepository.findByUserName(authentication.getName());            //buscamos el user logeado
@@ -156,10 +161,28 @@ public class SalvoController {
         }
 
         if(salvo.getLocations().size() != 5 ) {                                      //Para acceder al valor del optional necesesito el .get/ Si no hay nada en el optional el .get genera error
-            return new ResponseEntity<>(makeMap("error","You should add 5 salvoes, no more, no less."), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("You should add 5 salvoes, no more, no less.", HttpStatus.FORBIDDEN);
         }
         if(salvo.getTurn() -1 != gamePlayer.get().getSalvoes().size() ) {                                      //Para acceder al valor del optional necesesito el .get/ Si no hay nada en el optional el .get genera error
-            return new ResponseEntity<>(makeMap("error","You should add 5 salvoes, no more, no less."), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("This is not your turn.", HttpStatus.FORBIDDEN);
+        }
+        if(gamePlayer.get().getGameStatus() != "FIRE"){
+            return new ResponseEntity<>("Wait, you can´t fire now...", HttpStatus.FORBIDDEN);
+        }
+        if(gamePlayer.get().getGameStatus() == "LOST"){
+            scoreRepository.save(new Score(LocalDateTime.now(), gamePlayer.get().getOpponent().get().getPlayer(), gamePlayer.get().getOpponent().get().getGame(), 0d ));
+            scoreRepository.save(new Score(LocalDateTime.now(), gamePlayer.get().getPlayer(), gamePlayer.get().getGame(), 0d ));
+
+        }
+       else if(gamePlayer.get().getGameStatus() == "TIE"){
+            scoreRepository.save(new Score(LocalDateTime.now(), gamePlayer.get().getOpponent().get().getPlayer(), gamePlayer.get().getOpponent().get().getGame(), 0.5 ));
+            scoreRepository.save(new Score(LocalDateTime.now(), gamePlayer.get().getPlayer(), gamePlayer.get().getGame(), 0.5 ));
+
+        }
+        else if(gamePlayer.get().getGameStatus() == "WIN"){
+            scoreRepository.save(new Score(LocalDateTime.now(), gamePlayer.get().getOpponent().get().getPlayer(), gamePlayer.get().getOpponent().get().getGame(), 1d ));
+            scoreRepository.save(new Score(LocalDateTime.now(), gamePlayer.get().getPlayer(), gamePlayer.get().getGame(), 1d ));
+
         }
         salvo.setGamePlayer(gamePlayer.get());
         salvoRepository.save(salvo);
